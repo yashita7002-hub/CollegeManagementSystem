@@ -23,16 +23,9 @@ const generateAccessAndRefreshTokens = async(userId) => {
 
 
 const registerUser = asyncHandler(async (req, res) => {
-    const {fullName, email, username, password, role, semester, department, year } = req.body
+    const {fullName, email, username, password, role,  } = req.body
 
    
-
-    if(role==="student"){
-       if(!semester && !year){
-        throw new ApiError(400, "Semester and year are required")
-       }
-    }
-
     const existedUser = await User.findOne({
         $or : [{email} ,{username}]
     })
@@ -47,9 +40,7 @@ const registerUser = asyncHandler(async (req, res) => {
         password,
         username,
         role,
-        department,
-        semester,
-        year
+       
 
     })
 

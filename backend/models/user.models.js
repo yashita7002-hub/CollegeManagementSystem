@@ -25,11 +25,6 @@ const UserSchema = new Schema({
     trim: true,
   },
 
-  profileImage: {
-    type: String, // cloudinary url
-    default: "default.png",
-  },
-
   
   password: {
     type: String,
@@ -42,10 +37,7 @@ const UserSchema = new Schema({
     enum: ["student", "professor", "admin"],
   },
 
-  department:{
-    type: String,
-    required: true,
-  },
+  
 
   refreshToken: {
     type: String,
@@ -61,23 +53,6 @@ const UserSchema = new Schema({
   },
 
 
-  isActive: {
-    type: Boolean,
-    default: false,
-  },
-
-  year: {
-    type: String,
-    required: function () {
-      return this.role === "student";
-    }
-  },
-  semester: {
-    type: Number,
-    required: function () {
-      return this.role === "student";
-    }
-  },
 
 
 }, {
