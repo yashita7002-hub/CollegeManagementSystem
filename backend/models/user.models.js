@@ -22,12 +22,7 @@ const UserSchema = new Schema(
       trim: true,
     },
 
-    fullName: {
-      type: String,
-      trim: true,
-      index: true,
-    },
-
+    
     role: {
       type: String,
       required: true,

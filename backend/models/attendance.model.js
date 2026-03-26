@@ -2,21 +2,21 @@ import mongoose from "mongoose"
 
 
 const AttendanceSchema = new Schema({
-  student:{
+  studentId:{
     type: Schema.Types.ObjectId,
     ref: "Student",
     required: true,
     index: true,
   },
 
-  course:{
+  courseCode:{
    type: Schema.Types.ObjectId,
     ref: "Student",
     required: true,
     index: true,
   },
 
-  professor:{
+  professorId:{
     type: Schema.Types.ObjectId,
     ref: "Student",
     required: true,

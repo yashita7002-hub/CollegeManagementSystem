@@ -9,11 +9,11 @@ userId:{
     unique:true,
 },
 
-/*fullName:{
+fullName:{
     type: Schema.Types.ObjectId,
     ref: User,
     required:true,
-},*/
+},
 
 department:{
     type:String,
@@ -24,7 +24,12 @@ department:{
 
 qualification:{
     type:String,
-}
+},
+
+ assignedCourses: [{ 
+    type: String, 
+    ref: 'Course' 
+  }],
 
 
 }, {

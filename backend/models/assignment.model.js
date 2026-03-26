@@ -6,17 +6,27 @@ const AssignmentSchema = new Schema({
         required:true,
     },
 
-    CourseName:{
-        type:String,
-        required: true,
-    },
+    
+    courseCode:{
+   type: Schema.Types.ObjectId,
+    ref: "Student",
+    required: true,
+    index: true,
+  },
 
     Deadline:{
         type:String,
         
     },
 
-    textForm:{
+    professorId:{
+    type: Schema.Types.ObjectId,
+    ref: "Student",
+    required: true,
+  },
+
+
+    Description:{
         type:String,
         required:true,
     },

@@ -11,11 +11,11 @@ userId:{
     unique:true,
 },
 
-/*fullName:{
+fullName:{
     type: Schema.Types.ObjectId,
     ref: User,
     required:true,
-},*/
+},
 
 year:{
     type:Number,
@@ -26,6 +26,11 @@ branch:{
     type:String,
     required:true,
 },
+
+enrolledCourses: [{ 
+    type: String, 
+    ref: 'Course',
+  }],
 
 
 }, {

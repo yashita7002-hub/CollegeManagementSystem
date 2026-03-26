@@ -20,21 +20,7 @@ const CoursesSchema = new Schema(
       
     },
 
-    department:{
-        type:String,
-        required:true,
-    },
-
-    professor:[{
-        type:Schema.Types.ObjectId,
-        ref:"Professor"
-    }],
-
-    students:[{
-        type: Schema.Types.ObjectId,
-        ref:"Student"
-    }]
-   
+       
 
 
 },{timestamps: true})

@@ -6,35 +6,41 @@ const testSchema = new mongoose.Schema({
     required: true
   },
 
-  topic: String,
-
-  description: {
-    type: String,
-    required: true,
-  },
-
-  course: {
+  courseId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Course",
     required: true
   },
 
-  professor: {
+  professorId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Professor",
     required: true
   },
 
-  fileUrl: String, // PDF / image
+  branch:{
+    type:String,
+    required:true,
+  },
 
-  totalMarks: {
+  year:{
+    type:Number,
+    required:true,
+  },
+ 
+  semester:{
+     type:Number,
+    required:true,
+
+  },
+
+  maxMarks: {
     type: Number,
     required: true
   },
 
-  deadline: {
-    type: Date,
-    required: true
+  dateConducted: {
+    timestamps
   }
 
 }, { timestamps: true });

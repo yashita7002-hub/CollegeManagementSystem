@@ -58,7 +58,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Create user
   const user = await User.create({
-    fullName,
+   
     email,
     username,
     role,
@@ -68,22 +68,24 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Role-based creation
   if (role === "student") {
-    if (!year || !branch) {
-      throw new ApiError(400, "Year & branch required for student");
+    if (!year || !branch || !fullName) {
+      throw new ApiError(400, "Year, branch, and fullName required for student");
     }
     await Student.create({
       userId: user._id,
+      fullName,
       year,
       branch
     });
   }
 
   if (role === "professor") {
-    if (!department || !qualification) {
-      throw new ApiError(400, "Department & qualification required");
+    if (!department || !qualification ||!fullName) {
+      throw new ApiError(400, "Department, qualification and fullName required");
     }
     await Professor.create({
       userId: user._id,
+      fullName,
       department,
       qualification
     });
@@ -95,7 +97,7 @@ const registerUser = asyncHandler(async (req, res) => {
     to: user.email,
     subject: "Your Account Has Been Created",
     html: `
-      <h3>Hello ${user.fullName}</h3>
+      <h3>Hello </h3>
       <p>Your account has been created by admin.</p>
       <p><strong>Username:</strong> ${user.username}</p>
       <p><strong>Password:</strong> ${randomPassword}</p>
