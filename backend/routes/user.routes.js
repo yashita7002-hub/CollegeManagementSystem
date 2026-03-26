@@ -5,6 +5,7 @@ import {
      refreshAccessToken,
      generateAccessAndRefreshTokens,
      registerUser,
+     forgotPassword,
 
 } from "../controllers/user.controller.js"
 import { verifyJWT } from "../middlewares/Auth.middleware.js"
@@ -16,5 +17,6 @@ router.route("/login").post(loginUser)
 router.route("/logout").post(verifyJWT, logoutUser)
  router.route("/refresh-token").post(refreshAccessToken)
  router.route("/register").post(registerUser)
+ router.route("/forgotPassword").post(verifyJWT, forgotPassword)
 
  export default router

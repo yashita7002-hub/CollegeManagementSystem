@@ -25,11 +25,7 @@ const UserSchema = new Schema({
     trim: true,
   },
 
-  
-  password: {
-    type: String,
-    required:true,
-  },
+ 
 
   role: {
     type: String,
@@ -52,6 +48,11 @@ const UserSchema = new Schema({
     type: Date,
   },
 
+  password:{
+    type:String,
+    
+  },
+
 
 
 
@@ -62,45 +63,6 @@ const UserSchema = new Schema({
 
 
 
-UserSchema.pre("save", async function () {
-  if (!this.isModified("password") || !this.password) return;
-  this.password = await bcrypt.hash(this.password, 10);
-});
-
-
-
-UserSchema.methods.isPasswordCorrect = async function (password) {
-  return await bcrypt.compare(password, this.password);
-};
-
-
-
-UserSchema.methods.generateAccessToken = function () {
-  return jwt.sign(
-    {
-      _id: this._id,
-      role: this.role,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-    }
-  );
-};
-
-
-
-UserSchema.methods.generateRefreshToken = function () {
-  return jwt.sign(
-    {
-      _id: this._id,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-    }
-  );
-};
 
 
 export const User = mongoose.model("User", UserSchema);

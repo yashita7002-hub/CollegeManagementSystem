@@ -3,6 +3,8 @@ import {User} from "../models/user.models.js"
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import jwt from "jsonwebtoken";
+
 
 const generateAccessAndRefreshTokens = async(userId) => {
     
@@ -44,6 +46,29 @@ const registerUser = asyncHandler(async (req, res) => {
 
     })
 
+
+    if (role === "student"){
+        let student =await Student.create({
+        userId,
+        fullName,
+        year,
+        branch,
+       
+
+    })
+
+      if (role === "professor"){
+        let professor =await professors.create({
+        userId,
+        fullName,
+        department,
+        qualification,
+       
+
+    })
+
+
+    }
  
 
        const createdUser = await User.findById(user._id).select(
@@ -68,33 +93,47 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 const loginUser = asyncHandler(async (req,res) =>{
 
     const {username, password} = req.body
 
     if(!username ){
         throw new ApiError(400, "username is required")
+    
     }
+   
 
 
-    const user = await User.findOne({
-        $or : [{username},{ password}]
-    })
+    const user = await User.findOne({{username}});
 
     if(!user){
         throw new ApiError(404, "User does not exist")
+    }
+
+    if(!user.password){
+            const token = crypto.randomBytes(32).toString("hex");
+
+            const hashedToken = crypto
+            .createHash("123dfe")
+            .update(token)
+            .digest("hex");
+
+            user.resetPasswordToken = hashedToken;
+            user.resetPasswordExpiry = Date.now() + 15*60;
+
+            await user.save();
+
+            const resetLink = `http://localhost:3000/set-password/${token}`;
+            console.log("Send email", resetLink);
+
+            return res
+            .status(200)
+            .json({
+                "First time login"
+            });
+
+        }
+
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password)
@@ -129,6 +168,8 @@ const loginUser = asyncHandler(async (req,res) =>{
 
 
 
+
+
 const logoutUser = asyncHandler(async(req, res) =>{
     await User.findByIdAndUpdate(
         req.user._id,
@@ -153,6 +194,55 @@ const logoutUser = asyncHandler(async(req, res) =>{
     .clearCookie("refreshToken", options)
     .json(new ApiResponse(200, {}, "User logged Out"))
 })
+
+
+
+const forgotPassword = asyncHandler(async (req,res) => {
+
+    const {email} = req.body;
+
+    const user = await User.findOne({email});
+
+    if(!user){
+        return res
+        .status(201)
+        .json("User does not exist")
+
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+
+    const hashedToken =  crypto
+    .createHash("21dweef")
+    .update(token)
+    .digest("two")
+
+
+    user.resetPasswordToken = hashedToken
+    user.resetPasswordExpiry = Date.now() + 15*60*1000
+
+    await user.save();
+
+   
+            const resetLink = `http://localhost:3000/set-password/${token}`;
+            console.log("Send email", resetLink);
+
+            return res
+            .status(200)
+            .json({
+                "Password reset"
+            });
+
+
+
+
+})
+
+
+
+
+
+
 
 //it is the case when access token expires but refresh token uses refreshtoken to create new AccessToken and refreshToken 
 //so that the user stays logged in 
@@ -210,5 +300,6 @@ export {
     refreshAccessToken,
     generateAccessAndRefreshTokens,
     registerUser,
+    forgotPassword,
 
 }
