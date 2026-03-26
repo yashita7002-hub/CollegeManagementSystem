@@ -1,5 +1,6 @@
 import express from "express"
 import userRouter from "./routes/user.routes.js"
+import courseRouter from "./routes/course.routes.js"
 import cookieParser from "cookie-parser"
 import cors from "cors"
 
@@ -37,7 +38,7 @@ app.use(express.static("public"))//serves file that dont change on server that a
 //routes declaration
 app.use(cookieParser())
 app.use("/api/v1/users", userRouter)
-
+app.use("/api/v1/courses", courseRouter)
 
 
 export {app}

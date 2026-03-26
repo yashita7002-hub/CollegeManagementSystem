@@ -19,7 +19,6 @@ router.route("/forgotPassword").post(forgotPassword);
 router.route("/set-password/:token").patch(setPassword);
 router.route("/refresh-token").post(refreshAccessToken);
 
-// PROTECTED ROUTES
 router.route("/logout").post(verifyJWT, logoutUser);
 
 export default router;

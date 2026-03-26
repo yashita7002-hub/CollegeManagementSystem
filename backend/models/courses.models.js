@@ -1,6 +1,7 @@
-import mongoose from "mongoose";
+import mongoose,{Schema} from "mongoose";
 
-const CoursesSchema = new Schema({
+const CoursesSchema = new Schema(
+    {
 
     courseName:{
         type: String,
@@ -41,7 +42,7 @@ const CoursesSchema = new Schema({
 
 
 
-export const Courses = mongoose.model("Students", CoursesSchema)
+export const Course = mongoose.model("Course", CoursesSchema)
 
 
 
