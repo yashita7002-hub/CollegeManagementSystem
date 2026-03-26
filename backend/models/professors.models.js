@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-
+import { User } from "../models/user.models.js";
 
 const ProfessorSchema = new Schema({
 userId:{
@@ -9,11 +9,11 @@ userId:{
     unique:true,
 },
 
-fullName:{
+/*fullName:{
     type: Schema.Types.ObjectId,
     ref: User,
     required:true,
-},
+},*/
 
 department:{
     type:String,
@@ -31,7 +31,7 @@ qualification:{
   timestamps: true
 });
 
-ProfessorSchema.pre("save", async function () {
+/*ProfessorSchema.pre("save", async function () {
   if (!this.isModified("password") || !this.password) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
@@ -66,7 +66,7 @@ ProfessorSchema.methods.generateRefreshToken = function () {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
   );
-};
+};*/
 
 
 

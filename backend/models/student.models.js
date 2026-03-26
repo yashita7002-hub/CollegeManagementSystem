@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { User } from "../models/user.models.js";
 
 const StudentSchema = new Schema({
 userId:{
@@ -10,11 +11,11 @@ userId:{
     unique:true,
 },
 
-fullName:{
+/*fullName:{
     type: Schema.Types.ObjectId,
     ref: User,
     required:true,
-},
+},*/
 
 year:{
     type:Number,
@@ -32,7 +33,7 @@ branch:{
 });
 
 
-StudentSchema.pre("save", async function () {
+/*StudentSchema.pre("save", async function () {
   if (!this.isModified("password") || !this.password) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
@@ -67,7 +68,7 @@ StudentSchema.methods.generateRefreshToken = function () {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
     }
   );
-};
+};*/
 
 
 
