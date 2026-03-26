@@ -29,16 +29,16 @@ export const createCourse = asyncHandler(async (req, res) => {
 
 
 export const assignCoursesByBranchAndYear = asyncHandler(async (req, res) => {
-  const { branch, year, courseIds } = req.body;
+  const { branch, year, courseCode } = req.body;
 
-  if ([branch, year, courseIds].some(f => !f)) {
+  if ([branch, year, courseCode].some(f => !f)) {
     throw new ApiError(400, "All fields are required");
   }
 
   // Bulk update students
   const result = await Student.updateMany(
     { branch, year },
-    { $addToSet: { courses: { $each: courseIds } } } // prevents duplicates
+    { $addToSet: { courses: { $each: courseCode } } } // prevents duplicates
   );
 
   if (!result.modifiedCount) {
@@ -48,8 +48,8 @@ export const assignCoursesByBranchAndYear = asyncHandler(async (req, res) => {
   // Also update Course document(s) to reference students
   const students = await Student.find({ branch, year }).select("_id");
   await Course.updateMany(
-    { _id: { $in: courseIds } },
-    { $addToSet: { students: { $each: students.map(s => s._id) } } }
+    { courseCode:  { $in: courseCode } },
+    { $addToSet: { students: { $each: students.map(s => s._id) } } }//add branch year
   );
 
   res.status(200).json({
@@ -60,7 +60,7 @@ export const assignCoursesByBranchAndYear = asyncHandler(async (req, res) => {
 // 3️⃣ Assign courses to a professor
 export const assignCoursesToProfessor = asyncHandler(async (req, res) => {
   const { professorId } = req.params;
-  const { branch, year, courseIds } = req.body;
+  const { branch, year, courseCode } = req.body;
 
   const professor = await User.findById(professorId);
   if (!professor || professor.role !== "professor") {
@@ -71,16 +71,16 @@ export const assignCoursesToProfessor = asyncHandler(async (req, res) => {
   if (!professor.courses) professor.courses = [];
 
   // Add courses without duplicates
-  for (const courseId of courseIds) {
-    if (!professor.courses.includes(courseId)) {
-      professor.courses.push(courseId);
+  for (const courseId of courseCode) {
+    if (!professor.courses.includes(courseCode)) {
+      professor.courses.push(courseCode);
     }
   }
   await professor.save();
 
   // Update Course documents to reference this professor
   await Course.updateMany(
-    { _id: { $in: courseIds } },
+    {courseCode: { $in: courseCode } },
     { $addToSet: { professor: professor._id } }
   );
 
