@@ -299,12 +299,12 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  const resetLink = `http://localhost:3000/api/v1/users/set-password/${token}`;
+  const resetLink = `${process.env.FRONTEND_URL}/set-password/${token}`;
  await sendEmail({
   to: user.email,
   subject: "Reset Your Password",
   html: `
-    <h2>Hello ${user.fullName}</h2>
+    <h2>Hello ${user.fullName || user.username}</h2>
     <p>We received a request to reset your password. Click the link below:</p>
     <a href="${resetLink}" target="_blank">Reset Password</a>
     <p>This link will expire in 15 minutes.</p>

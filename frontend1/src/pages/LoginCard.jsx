@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function Login() {
-  // --- 2FA Authentication States ---
-  const [step, setStep] = useState(1);
-  const [role, setRole] = useState("student");
+  const location = useLocation();
+  const [step, setStep] = useState(location.state?.role ? 2 : 1);
+  const [role, setRole] = useState(location.state?.role || "student");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Update if they navigate back to the page with a new state
+  useEffect(() => {
+    if (location.state?.role) {
+      setRole(location.state.role);
+      setStep(2);
+    }
+  }, [location.state]);
 
   // --- Step Handlers ---
   const handleRoleSelection = (e) => {
@@ -169,12 +178,20 @@ export default function Login() {
               {loading ? "Checking Credentials..." : "Login"}
             </button>
             
-            <p 
-              className="text-xs text-blue-600 mt-2 cursor-pointer hover:underline" 
-              onClick={() => setStep(1)}
-            >
-              ← Back to role selection
-            </p>
+            <div className="flex justify-between items-center mt-2">
+              <p 
+                className="text-xs text-blue-600 cursor-pointer hover:underline" 
+                onClick={() => setStep(1)}
+              >
+                ← Back to role selection
+              </p>
+              <Link 
+                to="/forgot-password" 
+                className="text-xs text-blue-600 hover:underline"
+              >
+                Forgot Password?
+              </Link>
+            </div>
           </form>
         )}
 
