@@ -39,14 +39,6 @@ export const uploadCalendar = asyncHandler(async (req, res) => {
     });
   }
 });
-export const getCalendars = asyncHandler(async (req, res) => {
-  const calendars = await AcademicCalendar.find().sort({ createdAt: -1 });
-
-  res.status(200).json({
-    success: true,
-    data: calendars,
-  });
-});
 
 export const deleteCalendar = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -65,5 +57,15 @@ export const deleteCalendar = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Calendar deleted successfully",
+  });
+});
+
+
+export const getCalendar = asyncHandler(async (req, res) => {
+  const calendar = await AcademicCalendar.find().sort({ createdAt: -1 });
+
+  res.status(200).json({
+    success: true,
+    data: calendar,
   });
 });
