@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import UsersTab from './tabs/UsersTab';
-import CoursesTab from './tabs/CoursesTab';
-import CalendarTab from './tabs/CalendarTab';
-import LogsTab from './tabs/LogsTab';
+import UsersTab from './Admintabs/UsersTab';
+import CoursesTab from './Admintabs/CoursesTab';
+import CalendarTab from './Admintabs/CalendarTab';
+import LogsTab from './Admintabs/LogsTab';
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('users');
