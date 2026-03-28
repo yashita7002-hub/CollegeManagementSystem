@@ -11,11 +11,11 @@ const academicCalendarSchema = new Schema({
     required: true
   },
 
-  uploadedBy: {
+ /* uploadedBy: {
     type: Schema.Types.ObjectId,
     ref: "Admin",
     required: true
-  },
+  },*/
 
   year: {
     type: String, // e.g. "2025-26"

@@ -141,3 +141,45 @@ export const AssignCourseToProfessors = asyncHandler(async (req, res) => { // 2.
         new ApiResponse(200, updatedProfessor, `Successfully assigned professor in ${courseCode}`)
     );
 });
+
+
+// ================= GET ALL COURSES (ADMIN) =================
+export const getAllCourses = asyncHandler(async (req, res) => {
+  const courses = await Course.find({}).sort({ createdAt: -1 });
+
+  return res.status(200).json(
+    new ApiResponse(200, courses, "Courses fetched successfully")
+  );
+});
+
+// ================= DELETE COURSE (ADMIN) =================
+export const deleteCourse = asyncHandler(async (req, res) => {
+  const { courseCode } = req.params;
+
+  if (!courseCode) {
+    throw new ApiError(400, "Course code is required to perform deletion.");
+  }
+
+  const courseExists = await Course.findOne({ courseCode });
+  if (!courseExists) {
+    throw new ApiError(404, "Course not found.");
+  }
+
+  // Remove the course from Professor and Student assigned arrays
+  await Student.updateMany(
+    { enrolledCourses: courseCode },
+    { $pull: { enrolledCourses: courseCode } }
+  );
+
+  await Professor.updateMany(
+    { assignedCourses: courseCode },
+    { $pull: { assignedCourses: courseCode } }
+  );
+
+  // Finally delete the course
+  await Course.findByIdAndDelete(courseExists._id);
+
+  return res.status(200).json(
+    new ApiResponse(200, {}, `Course ${courseCode} has been completely deleted.`)
+  );
+});

@@ -30,7 +30,7 @@ export default function SetPassword() {
         setMessage(res.data.message || "Password set successfully!");
         setTimeout(() => {
           navigate("/login");
-        }, 2000);
+        }, 1000);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Failed to set password. Token might be expired.");

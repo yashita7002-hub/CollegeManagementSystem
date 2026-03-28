@@ -1,41 +1,68 @@
-import { v2 as cloudinary } from "cloudinary"
-import fs from "fs"
+import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+
+dotenv.config(); // IMPORTANT: inside this file
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  secure: true,
+});
+
+export { cloudinary };
 
 
-const uploadOnCloudinary = async (localFilePath) => {
-   
-    console.log("Uploading file:", localFilePath);
-    try {
-        if (!localFilePath) return null
 
-        // ✅ WAIT for upload
-        const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto"
-        })
 
-        // ✅ log after upload
-        console.log("File uploaded:", response.url)
+import fs from "fs";
 
-        // ✅ delete local file
-        fs.unlinkSync(localFilePath)
+export const uploadOnCloudinary = async (localFilePath) => {
+  try {
+    if (!localFilePath) return null;
 
-        return response
+    const result = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+    });
 
-    } catch (error) {
-        // ❗ prevent crash if file doesn't exist
-        if (fs.existsSync(localFilePath)) {
-            fs.unlinkSync(localFilePath)
-        }
-
-        console.log("Cloudinary error:", error)
-        return null
+    return result;
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    return null;
+  } finally {
+    if (fs.existsSync(localFilePath)) {
+      fs.unlinkSync(localFilePath);
     }
-}
+  }
+};
 
-export { uploadOnCloudinary }
+export const deleteFromCloudinary = async (fileUrl) => {
+  try {
+    if (!fileUrl) return null;
+    
+    const urlParts = fileUrl.split('/');
+    const versionIndex = urlParts.findIndex(part => part.startsWith('v') && !isNaN(part.substring(1)));
+    
+    if (versionIndex === -1) {
+      console.error("Could not parse Cloudinary URL");
+      return null;
+    }
+    
+    const publicIdWithExtension = urlParts.slice(versionIndex + 1).join('/');
+    const resourceType = fileUrl.includes('/raw/') ? 'raw' : (fileUrl.includes('/video/') ? 'video' : 'image');
+    
+    let publicId = publicIdWithExtension;
+    if (resourceType !== 'raw') {
+      const lastDotIndex = publicId.lastIndexOf('.');
+      if (lastDotIndex !== -1) {
+        publicId = publicId.substring(0, lastDotIndex);
+      }
+    }
+    
+    const result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
+    return result;
+  } catch (error) {
+    console.error("Cloudinary delete error:", error);
+    return null;
+  }
+};

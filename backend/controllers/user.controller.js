@@ -190,9 +190,8 @@ const setPassword = asyncHandler(async (req, res) => {
 
 
 // ================= LOGIN (STEP 1: SEND OTP) =================
-// ================= LOGIN (STEP 1: SEND OTP) =================
 export const loginUser = asyncHandler(async (req, res) => {
-  // 1. ADD ROLE to req.body so the backend can accept what the user chose!
+ 
   const { username, password, role } = req.body;
 
   if (!username || !password || !role) {
@@ -203,7 +202,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   if (!user) throw new ApiError(404, "User not found");
 
-  // 2. NEW SECURITY CHECK: Do they actually have the role they clicked?
+  // 2. NEW SECURITY CHECK: 
   if (user.role !== role) {
     throw new ApiError(403, `Access Denied. This account is registered as a ${user.role}, not a ${role}.`);
   }
@@ -212,7 +211,6 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   if (!isPasswordValid) throw new ApiError(401, "Invalid password");
 
-  // 3. Keep the rest of your math/OTP code identically as you wrote it!
   const otp = Math.floor(100000 + Math.random() * 900000);
   user.otp = otp;
   user.otpExpiry = Date.now() + 5 * 60 * 1000;
@@ -230,7 +228,7 @@ export const loginUser = asyncHandler(async (req, res) => {
 
 // ================= VERIFY OTP (STEP 2: GRANT ACCESS) =================
 export const verifyOtp = asyncHandler(async (req, res) => {
-  // This controller stays EXACTLY the same as what you wrote earlier!
+
   const { username, otp } = req.body;
   const user = await User.findOne({ username });
 
@@ -240,6 +238,7 @@ export const verifyOtp = asyncHandler(async (req, res) => {
 
   user.otp = undefined;
   user.otpExpiry = undefined;
+  user.loginLogs.push(Date.now());
   await user.save();
 
   const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id);
@@ -439,8 +438,35 @@ export const updateAccountDetails = asyncHandler(async (req, res) => {
 
 
 
+// ================= GET ALL USERS (ADMIN) =================
+const getAllUsers = asyncHandler(async (req, res) => {
+  // We want to return users along with their Student/Professor profiles if they have one.
+  const users = await User.find({}).sort({ createdAt: -1 });
+
+  // Let's attach full names from their respective profiles for easy dashboard viewing
+  const enrichedUsers = await Promise.all(
+    users.map(async (u) => {
+      let profile = null;
+      if (u.role === "student") {
+        profile = await Student.findOne({ userId: u._id }).select("fullName year branch enrolledCourses");
+      } else if (u.role === "professor") {
+        profile = await Professor.findOne({ userId: u._id }).select("fullName department qualification assignedCourses");
+      }
+
+      return {
+        ...u.toObject(),
+        profile: profile || {}
+      };
+    })
+  );
+
+  return res.status(200).json(
+    new ApiResponse(200, enrichedUsers, "Users fetched successfully")
+  );
+});
+
 // ================= DELETE ACCOUNT =================
-export const DeleteAccount = asyncHandler(async (req, res) => {
+const DeleteAccount = asyncHandler(async (req, res) => {
 
   const { username } = req.body;
 
@@ -486,4 +512,6 @@ export {
 
   getCurrentUser,
   changeCurrentPassword,
+  getAllUsers,
+  DeleteAccount,
 };

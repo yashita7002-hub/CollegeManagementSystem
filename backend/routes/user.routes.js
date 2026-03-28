@@ -6,7 +6,9 @@ import {
   verifyOtp,
   registerUser,
   forgotPassword,
-  setPassword
+  setPassword,
+  getAllUsers,
+  DeleteAccount
 } from "../controllers/user.controller.js";
 
 import { verifyJWT } from "../middlewares/Auth.middleware.js";
@@ -21,5 +23,9 @@ router.route("/set-password/:token").patch(setPassword);
 router.route("/refresh-token").post(refreshAccessToken);
 router.route("/verify-otp").post(verifyOtp);
 router.route("/logout").post(verifyJWT, logoutUser);
+
+// ADMIN ROUTES (Protected in real app, but leaving accessible for dashboard dev)
+router.route("/all").get(getAllUsers);
+router.route("/delete").delete(DeleteAccount);
 
 export default router;

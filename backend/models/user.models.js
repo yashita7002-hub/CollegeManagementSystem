@@ -59,6 +59,10 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    loginLogs: [{
+      type: Date,
+    }],
   },
   {
     timestamps: true,
