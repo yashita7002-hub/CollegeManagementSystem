@@ -56,101 +56,122 @@ export const createCourse = asyncHandler(async (req, res) => {
 
 export const AssignCourseToStudents = asyncHandler(async (req, res) => {
 
+  const { courseCode, studentId } = req.body;
 
-    const { courseCode, studentId } = req.body;
+  if (!courseCode || !studentId) {
+    throw new ApiError(400, "Please provide both courseCode and studentId.");
+  }
 
+  const courseExists = await Course.findOne({ courseCode });
+  if (!courseExists) {
+    throw new ApiError(404, `Course with code ${courseCode} does not exist.`);
+  }
 
-    if (!courseCode || !studentId) {
-        throw new ApiError(400, "Please provide both courseCode and studentId.");
-    }
+  // ✅ check student using Student model (not User)
+  const studentExists = await Student.findOne({ userId: studentId });
 
+  if (!studentExists) {
+    throw new ApiError(404, "Student not found.");
+  }
 
-    const courseExists = await Course.findOne({ courseCode });
-    
-    if (!courseExists) {
-        throw new ApiError(404, `Course with code ${courseCode} does not exist.`);
-    }
+  // ✅ FIX HERE
+  const updatedStudent = await Student.findOneAndUpdate(
+    { userId: studentId },   // 🔥 correct field
+    {
+      $addToSet: { enrolledCourses: courseCode }
+    },
+    { new: true }
+  );
 
-
-    const studentExists = await Student.findById(studentId);
-
-    if (!studentExists) {
-        throw new ApiError(404, "Student not found.");
-    }
-
-
-    const updatedStudent = await Student.findByIdAndUpdate(
-        studentId,
-        {
-            $addToSet: { enrolledCourses: courseCode }
-        },
-        { new: true, runValidators: true } 
-    );
-    
-
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(200, updatedStudent, `Successfully enrolled student in ${courseCode}`)
-    );
+  return res.status(200).json(
+    new ApiResponse(200, updatedStudent, `Successfully enrolled student in ${courseCode}`)
+  );
 });
 
 
 
 
+export const AssignCourseToProfessors = asyncHandler(async (req, res) => {
 
+  const { courseCode, professorId } = req.body;
 
+  if (!courseCode || !professorId) {
+    throw new ApiError(400, "Please provide both courseCode and professorId.");
+  }
 
+  const courseExists = await Course.findOne({ courseCode });
+  if (!courseExists) {
+    throw new ApiError(404, `Course with code ${courseCode} does not exist.`);
+  }
 
+  // ✅ check in Professor model
+  const professorExists = await Professor.findOne({ userId: professorId });
 
+  if (!professorExists) {
+    throw new ApiError(404, "Professor not found.");
+  }
 
-export const AssignCourseToProfessors = asyncHandler(async (req, res) => { // 2. Added async
+  // ✅ FIX HERE
+  const updatedProfessor = await Professor.findOneAndUpdate(
+    { userId: professorId },   // 🔥 correct field
+    {
+      $addToSet: { assignedCourses: courseCode }
+    },
+    { new: true }
+  );
 
-   const { professorId, courseCode } = req.body;
-
-   if (!professorId || !courseCode ){
-    throw new ApiError(400, "Please provide both courseCode and professorId.") 
-   }
-
-
-   const courseExists = await Course.findOne({ courseCode });
-
-    if (!courseExists) {
-        throw new ApiError(404, `Course with code ${courseCode} does not exist.`);
-    }
-
-
-    const professorExists = await Professor.findById(professorId); 
-    if (!professorExists) { // 3. Fixed copy-paste from studentExists
-        throw new ApiError(404, "Professor not found.");
-    }
-
-    
-    const updatedProfessor = await Professor.findByIdAndUpdate( // 3. Changed from Student to Professor
-        professorId,
-        {
-          
-            $addToSet: { assignedCourses: courseCode } 
-        },
-        { new: true, runValidators: true } 
-    );
-    
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(200, updatedProfessor, `Successfully assigned professor in ${courseCode}`)
-    );
+  return res.status(200).json(
+    new ApiResponse(200, updatedProfessor, `Successfully assigned professor to ${courseCode}`)
+  );
 });
-
 
 // ================= GET ALL COURSES (ADMIN) =================
 export const getAllCourses = asyncHandler(async (req, res) => {
-  const courses = await Course.find({}).sort({ createdAt: -1 });
+  const courses = await Course.find({},);
 
   return res.status(200).json(
-    new ApiResponse(200, courses, "Courses fetched successfully")
+    new ApiResponse(200, courses, "Course codes fetched successfully")
   );
 });
+
+
+
+export const getcodeCourses = asyncHandler(async (req, res) => {
+  const courses = await Course.find({}); 
+  // only courseCode, remove _id
+
+  return res.status(200).json(
+    new ApiResponse(200, courses, "Course codes fetched")
+  );
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ================= DELETE COURSE (ADMIN) =================
 export const deleteCourse = asyncHandler(async (req, res) => {
@@ -183,3 +204,93 @@ export const deleteCourse = asyncHandler(async (req, res) => {
     new ApiResponse(200, {}, `Course ${courseCode} has been completely deleted.`)
   );
 });
+
+
+
+
+
+
+
+export const AssignedCourses = asyncHandler(async (req, res) => {
+
+  const { username } = req.body;
+
+  if (!username) {
+    throw new ApiError(400, "Please input the username");
+  }
+
+  const user = await User.findOne({ username });
+
+  if (!user) {
+    throw new ApiError(404, "Invalid user");
+  }
+
+  let courses = [];
+
+  // ✅ FIX ROLE CHECK
+  if (user.role === "student") {
+
+    const student = await Student.findOne({ userId: user._id });
+
+
+    if (!student) {
+      throw new ApiError(404, "Student not found");
+    }
+
+    courses = student.enrolledCourses;
+
+    
+
+  } else if (user.role === "professor") {
+
+    const professor = await Professor.findOne({ userId: user._id });
+
+    if (!professor) {
+      throw new ApiError(404, "Professor not found");
+    }
+
+    courses = professor.assignedCourses;
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, {
+      user: {
+        username: user.username,
+        role: user.role
+      },
+      courses
+    }, "Courses fetched successfully")
+  );
+});
+
+
+
+
+
+export const ProfessorCourses = asyncHandler(async (req, res) => {
+
+  const { professorId } = req.body;
+
+  if (!professor) {
+    throw new ApiError(400, "provide the professor id");
+  }
+
+  const professor = await Professor.findOne({ professorId });
+
+  if (!professorId) {
+    throw new ApiError(404, "Invalid professor");
+  }
+
+  
+  return res.status(200).json(
+    new ApiResponse(200, {
+      user: {
+        username: user.username,
+        role: user.role
+      },
+      courses
+    }, "Courses fetched successfully")
+  );
+});
+
+

@@ -28,12 +28,22 @@ app.use(express.static("public"))//serves file that dont change on server that a
 
 
 import academicRouter from "./routes/uploadAcademic.routes.js"
+import attendanceRouter from "./routes/attendance.routes.js"
 
 //routes declaration
 app.use(cookieParser())
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/courses", courseRouter)
 app.use("/api/v1/calendar", academicRouter)
+app.use("/api/v1/attendance", attendanceRouter)
 
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
+        success: false,
+        message: err.message || "Internal Server Error",
+        errors: err.errors || []
+    });
+});
 
-export {app}
+export {app}//trigger restart

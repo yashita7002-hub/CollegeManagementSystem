@@ -27,9 +27,9 @@ branch:{
 },
 
 enrolledCourses: [{ 
-    type: String, 
+    type: String,
     ref: 'Course',
-  }],
+}]
 
 
 }, {

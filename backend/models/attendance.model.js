@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose, { Schema } from "mongoose"
 
 
 const AttendanceSchema = new Schema({
@@ -11,19 +11,19 @@ const AttendanceSchema = new Schema({
 
   courseCode:{
    type: Schema.Types.ObjectId,
-    ref: "Student",
+    ref: "Course",
     required: true,
     index: true,
   },
 
   professorId:{
     type: Schema.Types.ObjectId,
-    ref: "Student",
+    ref: "Professor",
     required: true,
   },
 
   date:{
-    type: Data,
+    type: Date,
     required: true,
   },
 
@@ -40,7 +40,7 @@ const AttendanceSchema = new Schema({
 }, {timestamps:true})
 
 AttendanceSchema.index(
-    {student: 1, course: 1, date: 1},
+    {studentId: 1, courseCode: 1, date: 1},
     {unique: true},
 );
 

@@ -440,31 +440,13 @@ export const updateAccountDetails = asyncHandler(async (req, res) => {
 
 // ================= GET ALL USERS (ADMIN) =================
 const getAllUsers = asyncHandler(async (req, res) => {
-  // We want to return users along with their Student/Professor profiles if they have one.
-  const users = await User.find({}).sort({ createdAt: -1 });
 
-  // Let's attach full names from their respective profiles for easy dashboard viewing
-  const enrichedUsers = await Promise.all(
-    users.map(async (u) => {
-      let profile = null;
-      if (u.role === "student") {
-        profile = await Student.findOne({ userId: u._id }).select("fullName year branch enrolledCourses");
-      } else if (u.role === "professor") {
-        profile = await Professor.findOne({ userId: u._id }).select("fullName department qualification assignedCourses");
-      }
-
-      return {
-        ...u.toObject(),
-        profile: profile || {}
-      };
-    })
-  );
+  const users = await User.find({}).select("-password"); // ✅ fetch all users
 
   return res.status(200).json(
-    new ApiResponse(200, enrichedUsers, "Users fetched successfully")
+    new ApiResponse(200, users, "Users fetched successfully")
   );
 });
-
 // ================= DELETE ACCOUNT =================
 const DeleteAccount = asyncHandler(async (req, res) => {
 

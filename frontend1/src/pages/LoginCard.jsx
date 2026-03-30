@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 export default function Login() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [step, setStep] = useState(location.state?.role ? 2 : 1);
   const [role, setRole] = useState(location.state?.role || "student");
   const [username, setUsername] = useState("");
@@ -12,6 +14,7 @@ export default function Login() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { login } = useContext(AuthContext);
 
   // Update if they navigate back to the page with a new state
   useEffect(() => {
@@ -54,10 +57,14 @@ export default function Login() {
     try {
       const res = await axios.post("/api/v1/users/verify-otp", { username, otp });
       if (res.status === 200) {
+        // Set context
+        if (res.data?.user) {
+          login(res.data.user);
+        }
         // Redirect to the correct exact dashboard
-        if (role === "student") window.location.href = "/student-dashboard";
-        if (role === "professor") window.location.href = "/professor-dashboard";
-        if (role === "admin") window.location.href = "/admin-dashboard";
+        if (role === "student") navigate("/student-dashboard");
+        if (role === "professor") navigate("/professor-dashboard");
+        if (role === "admin") navigate("/admin-dashboard");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Invalid OTP");

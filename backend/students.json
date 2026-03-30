@@ -1,0 +1,46 @@
+{
+  "users": [
+    {
+      "_id": "69c7a303d446d2e9270762fd",
+      "username": "2025ugcs011",
+      "email": "2025ugcs011@nitjsr.ac.in",
+      "role": "student",
+      "isVerified": true,
+      "loginLogs": [
+        "2026-03-28T09:47:16.199Z",
+        "2026-03-28T10:30:30.266Z",
+        "2026-03-28T12:11:50.411Z"
+      ],
+      "createdAt": "2026-03-28T09:44:35.028Z",
+      "updatedAt": "2026-03-28T12:11:50.521Z",
+      "__v": 3,
+      "password": "$2b$12$QvQYEzA/ODwoMSZalyUFWuBQsjdYfUZ/bvNHvQPFEn/1rqFrMhD1.",
+      "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWM3YTMwM2Q0NDZkMmU5MjcwNzYyZmQiLCJpYXQiOjE3NzQ2OTk5MTAsImV4cCI6MTc3NTU2MzkxMH0.WEe2HeKTda4_0vIOUT6LIsCsWHI9jTrI9IkF1jB7JwE"
+    }
+  ],
+  "students": [
+    {
+      "_id": "69c4f9e2bec7b6278ff64174",
+      "userId": "69c4f9e2bec7b6278ff64172",
+      "year": 1,
+      "branch": "CSE",
+      "createdAt": "2026-03-26T09:18:26.976Z",
+      "updatedAt": "2026-03-26T12:06:54.981Z",
+      "__v": 0
+    },
+    {
+      "_id": "69c7a303d446d2e9270762ff",
+      "userId": "69c7a303d446d2e9270762fd",
+      "fullName": "Yashita",
+      "year": 2025,
+      "branch": "CSE",
+      "enrolledCourses": [
+        "CS102",
+        "CS103"
+      ],
+      "createdAt": "2026-03-28T09:44:35.142Z",
+      "updatedAt": "2026-03-29T06:14:46.651Z",
+      "__v": 0
+    }
+  ]
+}
