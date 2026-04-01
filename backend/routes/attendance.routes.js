@@ -4,8 +4,10 @@ import {
   getStudentAttendanceReport,
   getStudentsForAttendance,
   AttendanceBulkUpdater,
-  getAttendanceRecords
+  getAttendanceRecords,
+  getStudentAttendanceSummary
 } from "../controllers/attendance.controller.js";
+import { verifyJWT } from "../middlewares/Auth.middleware.js";
 
 const router = Router();
 
@@ -17,5 +19,6 @@ router.get("/report/:studentId/:courseCode", getStudentAttendanceReport);
 router.get("/students", getStudentsForAttendance);
 router.post("/upload-bulk", AttendanceBulkUpdater);
 router.get("/records", getAttendanceRecords);
+router.get("/student-summary", verifyJWT, getStudentAttendanceSummary);
 
 export default router;

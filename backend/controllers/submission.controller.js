@@ -2,97 +2,124 @@ import mongoose from "mongoose";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Assignment } from "../models/assignment.model.js";
 import { Student } from "../models/student.models.js";
-import { Professor } from "../models/professors.models.js"; 
 import { Submission } from "../models/submission.models.js"; 
 import { ApiError } from "../utils/ApiError.js";             
 import { ApiResponse } from "../utils/ApiResponse.js";       
 import { uploadOnCloudinary } from "../utils/cloudinary.js"; 
 
 const submitAssignment = asyncHandler(async (req, res) => {
+    const { assignmentId, description } = req.body;
+    const userId = req.user._id;
 
-    const { assignmentId, studentId, professorId, description } = req.body;
-
-    if(!assignmentId || !studentId || !professorId) {
-        throw new ApiError(400, "assignmentId, studentId, and professorId are required fields");
+    if (!assignmentId) {
+        throw new ApiError(400, "assignmentId is required");
     }
 
-    const AssignmentExists = await Assignment.findById(assignmentId);
-    if (!AssignmentExists) {
+    // Find student profile
+    const student = await Student.findOne({ userId });
+    if (!student) {
+        throw new ApiError(404, "Student profile not found.");
+    }
+
+    // Find the assignment to get the professorId
+    const assignment = await Assignment.findById(assignmentId);
+    if (!assignment) {
         throw new ApiError(404, "Assignment not found.");
     }
 
-    const StudentExists = await Student.findById(studentId);
-    if (!StudentExists) {
-        throw new ApiError(404, "Student not found.");
+    const submissionFileLocalPath = req.file?.path;
+    if (!submissionFileLocalPath) {
+        throw new ApiError(400, "Submission file (PDF/Image) is required");
     }
 
-    const professorExists = await Professor.findById(professorId);
-    if (!professorExists) {
-        throw new ApiError(404, "Professor not found.");
-    }
-
-
-    const submissionUrlLocalPath = req.files?.submissionUrl?.[0]?.path;
-     
-    if (!submissionUrlLocalPath) {
-        throw new ApiError(400, "Submission pdf/image is required");
-    }
-
-    
-    const cloudinaryResponse = await uploadOnCloudinary(submissionUrlLocalPath);
-      
+    const cloudinaryResponse = await uploadOnCloudinary(submissionFileLocalPath);
     if (!cloudinaryResponse) {
         throw new ApiError(500, "Failed to upload file to Cloudinary");
     }
 
-    // Create the document in the DB
-    const SubmissionDone = await Submission.create({
+    // Check if a submission already exists for this student and assignment
+    const existingSubmission = await Submission.findOne({
         assignmentId,
-        studentId, 
-        professorId,
-        submissionUrl: cloudinaryResponse.url, 
-        description: description || ""        
+        studentId: student._id
     });
 
-    if (!SubmissionDone) {
+    let submission;
+    if (existingSubmission) {
+        // Update existing submission
+        existingSubmission.submissionUrl = cloudinaryResponse.url;
+        existingSubmission.description = description || existingSubmission.description;
+        existingSubmission.submittedAt = new Date();
+        submission = await existingSubmission.save();
+    } else {
+        // Create the document in the DB
+        submission = await Submission.create({
+            assignmentId,
+            studentId: student._id, 
+            professorId: assignment.professorId,
+            submissionUrl: cloudinaryResponse.url, 
+            description: description || ""        
+        });
+    }
+
+    if (!submission) {
         throw new ApiError(500, "Something went wrong while submitting the assignment");
     }
     
-   
     return res.status(201).json(
-        new ApiResponse(201, SubmissionDone, "Assignment submitted successfully")
+        new ApiResponse(201, submission, "Assignment submitted successfully")
     );
 });
 
+const getSubmissionsByAssignment = asyncHandler(async (req, res) => {
+    const { assignmentId } = req.params;
 
-
-const evaluateAssignment = asyncHandler(async(req,res) => {
-
-
-    const {submissionId} = req.params;
-    const {marksObtained,feedback} = req.body;
-
-      if (marksObtained === undefined || marksObtained === null) {
-        throw new ApiError(400, "marksObtained field is required to evaluate");
+    if (!assignmentId) {
+        throw new ApiError(400, "assignmentId is required");
     }
 
-      const existingSubmission = await Submission.findById(submissionId);
-    if (!existingSubmission) {
+    const submissions = await Submission.find({ assignmentId })
+        .populate({
+            path: "studentId",
+            select: "fullName branch year userId",
+            populate: {
+                path: "userId",
+                select: "username email"
+            }
+        })
+        .sort({ submittedAt: -1 });
+
+    return res.status(200).json(
+        new ApiResponse(200, submissions, "Submissions fetched successfully")
+    );
+});
+
+const evaluateAssignment = asyncHandler(async (req, res) => {
+    const { submissionId } = req.params;
+    const { marksObtained, feedback } = req.body;
+    const professorUserId = req.user._id;
+
+    if (marksObtained === undefined || marksObtained === null) {
+        throw new ApiError(400, "marksObtained field is required for evaluation");
+    }
+
+    const submission = await Submission.findById(submissionId);
+    if (!submission) {
         throw new ApiError(404, "Submission not found.");
     }
 
-
-      if (existingSubmission.professorId.toString() !== req.user._id.toString()) {
-         throw new ApiError(403, "You do not have permission to grade another professor's assignment.");
+    // Verification that this professor is the one assigned to the submission
+    // We need to compare professorUserId from Submission -> Professor model -> userId
+    const submissionWithProf = await Submission.findById(submissionId).populate("professorId");
+    if (submissionWithProf.professorId.userId.toString() !== professorUserId.toString()) {
+        throw new ApiError(403, "You do not have permission to evaluate this submission.");
     }
 
-        const evaluatedSubmission = await Submission.findByIdAndUpdate(
+    const evaluatedSubmission = await Submission.findByIdAndUpdate(
         submissionId,
         {
-            marksObtained: marksObtained,
-            feedback: feedback || "" // If they didn't leave feedback, just save an empty string
+            marksObtained,
+            feedback: feedback || ""
         },
-        // 'new: true' forces Mongoose to return the freshly updated document, not the old one
         { new: true, runValidators: true } 
     );
     
@@ -101,11 +128,32 @@ const evaluateAssignment = asyncHandler(async(req,res) => {
     );
 });
 
+const getStudentSubmissionForAssignment = asyncHandler(async (req, res) => {
+    const { assignmentId } = req.params;
+    const userId = req.user._id;
 
+    const student = await Student.findOne({ userId });
+    if (!student) {
+        throw new ApiError(404, "Student profile not found.");
+    }
+
+    const submission = await Submission.findOne({
+        assignmentId,
+        studentId: student._id
+    });
+
+    return res.status(200).json(
+        new ApiResponse(200, submission, "Submission fetched successfully")
+    );
+});
 
 export {
-    submitAssignment,evaluateAssignment
+    submitAssignment,
+    evaluateAssignment,
+    getSubmissionsByAssignment,
+    getStudentSubmissionForAssignment
 }
+
  
 
 

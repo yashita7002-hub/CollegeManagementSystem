@@ -1,25 +1,21 @@
 import mongoose from "mongoose";
-import { Assignment } from "./assignment.models.js";
-import {Student} from "./student.models.js"
-import {Professor} from "./professors.models.js"
 
 const submissionSchema = new mongoose.Schema({
   assignmentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: Assignment,
+    ref: "Assignment",
     required: true
   },
 
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: Student,
+    ref: "Student",
     required: true
   },
 
-
   professorId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: Professor,
+    ref: "Professor",
     required: true
   },
 

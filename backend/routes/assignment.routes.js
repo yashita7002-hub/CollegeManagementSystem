@@ -3,7 +3,8 @@ import {
    createAssignment,
    getAssignments,
    getAssignmentById,
-   deleteAssignment
+   deleteAssignment,
+   getStudentAssignments
 } from "../controllers/assignment.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/Auth.middleware.js";
@@ -39,6 +40,12 @@ router.delete(
   "/:id",
   verifyJWT,
   deleteAssignment
+);
+
+router.get(
+  "/student/assignments",
+  verifyJWT,
+  getStudentAssignments
 );
 
 export default router;

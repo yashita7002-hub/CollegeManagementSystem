@@ -1,5 +1,6 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Assignment } from "../models/assignment.model.js";
+import { Student } from "../models/student.models.js";
 import { ApiError } from "../utils/ApiError.js";             
 import { ApiResponse } from "../utils/ApiResponse.js";       
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js"; 
@@ -92,9 +93,31 @@ const deleteAssignment = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, {}, "Assignment deleted successfully"));
 });
 
+
+const getStudentAssignments = asyncHandler(async (req, res) => {
+  const userId = req.user._id;
+
+  // Find student profile to get their enrolled courses and branch
+  const student = await Student.findOne({ userId });
+  if (!student) {
+    throw new ApiError(404, "Student profile not found");
+  }
+
+  // Get assignments for student's branch AND matching one of their enrolled courses
+  const assignments = await Assignment.find({
+    branch: student.branch,
+    courseCode: { $in: student.enrolledCourses }
+  }).sort({ createdAt: -1 });
+
+  res.status(200).json(
+    new ApiResponse(200, assignments, "Student assignments fetched successfully")
+  );
+});
+
 export {
     createAssignment,
     getAssignments,
     getAssignmentById,
-    deleteAssignment
-}
+    deleteAssignment,
+    getStudentAssignments
+}

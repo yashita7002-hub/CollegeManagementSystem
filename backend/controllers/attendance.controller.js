@@ -208,6 +208,64 @@ export const getAttendanceRecords = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, records, "Attendance records fetched successfully."));
 });
 
+// NEW: Get student's overall attendance summary across all courses
+export const getStudentAttendanceSummary = asyncHandler(async (req, res) => {
+    const userId = req.user._id;
+
+    // Find the student profile for this user
+    const student = await Student.findOne({ userId });
+    if (!student) {
+        throw new ApiError(404, "Student profile not found.");
+    }
+
+    const attendanceSummary = await Attendance.aggregate([
+        {
+            $match: {
+                studentId: student._id
+            }
+        },
+        {
+            $group: {
+                _id: "$courseCode",
+                totalClasses: { $sum: 1 },
+                presentClasses: {
+                    $sum: { $cond: [{ $eq: ["$status", "present"] }, 1, 0] }
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: "courses",
+                localField: "_id",
+                foreignField: "_id",
+                as: "courseInfo"
+            }
+        },
+        {
+            $unwind: "$courseInfo"
+        },
+        {
+            $project: {
+                _id: 0,
+                courseId: "$_id",
+                courseCode: "$courseInfo.courseCode",
+                courseName: "$courseInfo.courseName",
+                totalClasses: 1,
+                presentClasses: 1,
+                percentage: {
+                    $multiply: [
+                        { $divide: ["$presentClasses", "$totalClasses"] },
+                        100
+                    ]
+                }
+            }
+        }
+    ]);
+
+    return res.status(200).json(
+        new ApiResponse(200, attendanceSummary, "Student attendance summary fetched successfully")
+    );
+});
 
 
 const getProfessorAllotedCourse= asyncHandler(async(req,res) => {

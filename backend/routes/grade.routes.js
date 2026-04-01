@@ -1,0 +1,22 @@
+import { Router } from "express";
+import {
+    uploadGrade,
+    getMyGrades
+} from "../controllers/grades.controller.js";
+import { verifyJWT } from "../middlewares/Auth.middleware.js";
+
+const router = Router();
+
+router.post(
+    "/upload",
+    verifyJWT,
+    uploadGrade
+);
+
+router.get(
+    "/my-grades",
+    verifyJWT,
+    getMyGrades
+);
+
+export default router;
