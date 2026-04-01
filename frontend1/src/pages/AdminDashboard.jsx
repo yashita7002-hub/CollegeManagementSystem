@@ -3,8 +3,11 @@ import UsersTab from './Admintabs/UsersTab';
 import CoursesTab from './Admintabs/CoursesTab';
 import CalendarTab from './Admintabs/CalendarTab';
 import LogsTab from './Admintabs/LogsTab';
+import { AuthContext } from '../context/AuthContext';
+import { useContext } from 'react';
 
 export default function AdminDashboard() {
+  const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState('users');
 
   const navItems = [
@@ -65,9 +68,9 @@ export default function AdminDashboard() {
             {navItems.find(n => n.id === activeTab)?.label}
           </h2>
           <div className="flex items-center gap-4 text-sm font-medium text-gray-600">
-            <span>Welcome back, System Admin</span>
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border-2 border-white shadow-sm">
-              AD
+            <span>Welcome back, {user?.username || 'Admin'}</span>
+            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold border-2 border-white shadow-sm uppercase">
+              {user?.username ? user.username.substring(0, 2) : 'AD'}
             </div>
           </div>
         </header>

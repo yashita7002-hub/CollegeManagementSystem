@@ -8,6 +8,7 @@ import ProfessorDashboard from "./pages/ProfessorDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import SetPassword from "./pages/SetPassword";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import FirstPage from "./pages/FirstPage";
 
@@ -24,9 +25,9 @@ export default function App() {
         <Route path="/set-password/:token" element={<SetPassword />} />
         
         {/* The Protected Dashboards */}
-        <Route path="/student-dashboard" element={<StudentDashboard />} />
-        <Route path="/professor-dashboard" element={<ProfessorDashboard />} />
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/student-dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+        <Route path="/professor-dashboard" element={<ProtectedRoute allowedRoles={['professor']}><ProfessorDashboard /></ProtectedRoute>} />
+        <Route path="/admin-dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
         
         {/* Catch-all for 404 Pages */}
         <Route path="*" element={<h1 className="text-center mt-20 text-2xl">404 - Page Not Found</h1>} />
