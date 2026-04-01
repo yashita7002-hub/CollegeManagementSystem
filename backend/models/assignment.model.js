@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Schema } from "mongoose";
 
 const AssignmentSchema = new Schema({
     title:{
@@ -6,32 +7,33 @@ const AssignmentSchema = new Schema({
         required:true,
     },
 
-    
     courseCode:{
-   type: Schema.Types.ObjectId,
-    ref: "Student",
-    required: true,
-    index: true,
-  },
+        type: String,
+        required: true,
+        index: true,
+    },
+    
+    branch: {
+        type: String,
+    },
 
-    Deadline:{
+    deadline:{
         type:String,
         
     },
 
     professorId:{
-    type: Schema.Types.ObjectId,
-    ref: "Student",
-    required: true,
-  },
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+    },
 
-
-    Description:{
+    description:{
         type:String,
         required:true,
     },
 
-    imageForm:{
+    mediaUrl:{
         type:String,
     },
 },{
@@ -39,4 +41,3 @@ const AssignmentSchema = new Schema({
 })
 
 export const Assignment = mongoose.model("Assignment", AssignmentSchema)
-

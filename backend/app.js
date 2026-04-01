@@ -29,6 +29,7 @@ app.use(express.static("public"))//serves file that dont change on server that a
 
 import academicRouter from "./routes/uploadAcademic.routes.js"
 import attendanceRouter from "./routes/attendance.routes.js"
+import assignmentRouter from "./routes/assignment.routes.js"
 
 //routes declaration
 app.use(cookieParser())
@@ -36,6 +37,7 @@ app.use("/api/v1/users", userRouter)
 app.use("/api/v1/courses", courseRouter)
 app.use("/api/v1/calendar", academicRouter)
 app.use("/api/v1/attendance", attendanceRouter)
+app.use("/api/v1/assignments", assignmentRouter)
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;

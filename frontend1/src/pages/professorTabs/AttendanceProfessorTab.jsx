@@ -15,7 +15,7 @@ function AttendanceTab() {
   const [branch, setBranch] = useState("");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
-  // Maps studentId to "present" or "absent"
+  
   const [attendanceStatuses, setAttendanceStatuses] = useState({});
 
   const [message, setMessage] = useState({ text: "", type: "" });

@@ -275,13 +275,39 @@ export const ProfessorCourses = asyncHandler(async (req, res) => {
     throw new ApiError(400, "provide the professor id");
   }
 
-  const professor = await Professor.findOne({ professorId });
+  const user = await Profeso.findOne({ username });
 
-  if (!professorId) {
-    throw new ApiError(404, "Invalid professor");
+  if (!user) {
+    throw new ApiError(404, "Invalid user");
   }
 
-  
+  let courses = [];
+
+  // ✅ FIX ROLE CHECK
+  if (user.role === "student") {
+
+    const student = await Student.findOne({ userId: user._id });
+
+
+    if (!student) {
+      throw new ApiError(404, "Student not found");
+    }
+
+    courses = student.enrolledCourses;
+
+    
+
+  } else if (user.role === "professor") {
+
+    const professor = await Professor.findOne({ userId: user._id });
+
+    if (!professor) {
+      throw new ApiError(404, "Professor not found");
+    }
+
+    courses = professor.assignedCourses;
+  }
+
   return res.status(200).json(
     new ApiResponse(200, {
       user: {

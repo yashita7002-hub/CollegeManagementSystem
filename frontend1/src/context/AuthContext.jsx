@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
+        axios.defaults.withCredentials = true;
         const res = await axios.get("/api/v1/users/current-user");
         if (res.data?.success) {
           setUser(res.data.data);
