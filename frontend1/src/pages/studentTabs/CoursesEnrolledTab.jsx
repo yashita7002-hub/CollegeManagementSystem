@@ -46,7 +46,7 @@ function CoursesAllotedTab() {
 
     fetchData();
   }, [user?.username]);
-
+//USE MEMO: Only recompute this value when dependencies change
   const assignedCoursesDetailed = useMemo(() => {
     return assignedCourseCodes
       .map((code) => allCourses.find((c) => c.courseCode === code))

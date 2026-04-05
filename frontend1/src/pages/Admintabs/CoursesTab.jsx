@@ -3,9 +3,9 @@ import axios from 'axios';
 
 export default function CoursesTab() {
 
-  const [activeTab, setActiveTab] = useState("CREATE"); // 🔥 KEY PART
+  const [activeTab, setActiveTab] = useState("CREATE"); // 
   const [searchUsername, setSearchUsername] = useState("");
-const [searchResult, setSearchResult] = useState(null);
+  const [searchResult, setSearchResult] = useState(null);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);

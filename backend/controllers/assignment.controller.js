@@ -9,7 +9,7 @@ import { Submission } from "../models/submission.models.js";
 const createAssignment = asyncHandler(async (req, res) => {
   const { title, courseCode, deadline, description, branch } = req.body;
 
-  const professorId = req.user._id; // ✅ from middleware
+  const professorId = req.user._id;
 
   if (!title || !courseCode || !deadline || !description) {
     throw new ApiError(400, "All required fields missing");
@@ -39,20 +39,6 @@ const createAssignment = asyncHandler(async (req, res) => {
 });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 const getAssignments = asyncHandler(async (req, res) => {
   const professorId = req.user._id;
   
@@ -62,6 +48,8 @@ const getAssignments = asyncHandler(async (req, res) => {
     new ApiResponse(200, assignments, "Assignments fetched successfully")
   );
 });
+
+
 
 const getAssignmentById = asyncHandler(async (req, res) => {
   const professorId = req.user._id;
@@ -74,6 +62,7 @@ const getAssignmentById = asyncHandler(async (req, res) => {
 
   res.status(200).json(new ApiResponse(200, assignment, "Assignment fetched successfully"));
 });
+
 
 const deleteAssignment = asyncHandler(async (req, res) => {
   const professorId = req.user._id;
@@ -133,4 +122,4 @@ export {
     getAssignmentById,
     deleteAssignment,
     getStudentAssignments
-}
+}

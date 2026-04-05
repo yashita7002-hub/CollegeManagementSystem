@@ -115,7 +115,7 @@ export default function ProfessorDashboard() {
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden md:block">
-              <p className="text-sm font-bold text-gray-900">Dr. {user?.username || 'Professor'}</p>
+              <p className="text-sm font-bold text-gray-900"> {user?.username || 'Professor'}</p>
               <p className="text-xs text-emerald-600 font-semibold tracking-widest">FACULTY</p>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center text-emerald-800 font-bold border-2 border-white shadow-md shadow-emerald-100 transition-transform hover:scale-105 cursor-pointer uppercase">

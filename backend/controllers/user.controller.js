@@ -123,7 +123,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 
-// ================= RESEND SET PASSWORD LINK =================
+//  RESEND SET PASSWORD LINK 
 const resendSetPasswordLink = asyncHandler(async (req, res) => {
   const { email } = req.body;
 

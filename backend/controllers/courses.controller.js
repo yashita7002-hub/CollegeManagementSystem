@@ -156,27 +156,6 @@ export const getcodeCourses = asyncHandler(async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // ================= DELETE COURSE (ADMIN) =================
 export const deleteCourse = asyncHandler(async (req, res) => {
   const { courseCode } = req.params;
@@ -208,11 +187,6 @@ export const deleteCourse = asyncHandler(async (req, res) => {
     new ApiResponse(200, {}, `Course ${courseCode} has been completely deleted.`)
   );
 });
-
-
-
-
-
 
 
 export const AssignedCourses = asyncHandler(async (req, res) => {
@@ -266,9 +240,6 @@ export const AssignedCourses = asyncHandler(async (req, res) => {
     }, "Courses fetched successfully")
   );
 });
-
-
-
 
 
 export const ProfessorCourses = asyncHandler(async (req, res) => {

@@ -27,7 +27,7 @@ router.route("/verify-otp").post(verifyOtp);
 router.route("/logout").post(verifyJWT, logoutUser);
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 
-// ADMIN ROUTES (Protected in real app, but leaving accessible for dashboard dev)
+// ADMIN ROUTES 
 router.route("/all").get(getAllUsers);
 router.route("/delete").delete(DeleteAccount);
 router.route("/professor/dashboard-stats").get(verifyJWT, getProfessorDashboardStats);

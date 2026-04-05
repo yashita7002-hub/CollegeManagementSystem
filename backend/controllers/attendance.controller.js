@@ -96,7 +96,7 @@ export const getStudentAttendanceReport = asyncHandler(async (req, res) => {
     );
 });
 
-// NEW: Fetch students for attendance based on year and course code
+// Fetch students for attendance based on  course code
 export const getStudentsForAttendance = asyncHandler(async (req, res) => {
     console.log("QUERY PARAMS:", req.query);
     const { courseCode, branch } = req.query;
@@ -118,7 +118,7 @@ export const getStudentsForAttendance = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, students, "Students fetched successfully."));
 });
 
-// NEW: Upload bulk attendance for course+year
+//  bulk attendance for course+year
 export const AttendanceBulkUpdater = asyncHandler(async (req, res) => {
     let { professorId, userId, courseCode, date, attendanceRecords } = req.body;
     // attendanceRecords = [{ studentId, status }, ...]

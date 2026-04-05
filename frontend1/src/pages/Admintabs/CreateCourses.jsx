@@ -142,7 +142,6 @@ export default function CoursesTab() {
       )}
     </div>
 
-   {/* ================= ASSIGN COURSES ================= */}
 
   
     </div>

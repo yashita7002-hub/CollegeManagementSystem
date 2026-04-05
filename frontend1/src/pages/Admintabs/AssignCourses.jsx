@@ -4,15 +4,6 @@ import axios from 'axios';
 function AssignCourses() {
 
 
-
-
-
-
-
-
-
-
-
  const fetchUsers = async () => {
   try {
     const res = await axios.get("/api/v1/users/all");
@@ -30,16 +21,7 @@ function AssignCourses() {
 }, []);
 
 
-
-
-
-
-
-
-
-
-
-      const handleAssign = async () => {
+const handleAssign = async () => {
 
     const usersList = role === "STUDENT" ? students : professors;
 
